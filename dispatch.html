@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Dispatch scanning · Anant Energies</title>
+<meta name="theme-color" content="#0D1838">
+<link rel="icon" href="img/favicon.png">
+<style>
+/* Staff page. Not linked from the website. Same colours as index.html. */
+:root {
+  --bg: #ECE9E2; --surface: #F6F4EF; --ink: #0D1838; --ink-2: #4A5372; --line: #D3CEC2;
+  --blue: #2253ED; --blue-ink: #1A3FB8; --on-blue: #FFFFFF; --cyan: #46C3D6;
+  --ok-bg: #DDF1E6; --ok-ink: #11683A; --warn-bg: #FFF1D6; --warn-ink: #8A5300;
+  --error-bg: #FBE7E6; --error-ink: #A3161A; --wait-ink: #4A5372;
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif; --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #080F26; --surface: #0F1A3A; --ink: #ECE9E2; --ink-2: #A3ABC6; --line: #24305A;
+    --blue: #4C78FF; --blue-ink: #8EA8FF; color-scheme: dark;
+    --ok-bg: #0E2E22; --ok-ink: #7FE0AA; --warn-bg: #33270C; --warn-ink: #FFD27A;
+    --error-bg: #3A1520; --error-ink: #FFB3B3; --wait-ink: #A3ABC6;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 640px; margin-inline: auto; padding-inline: 16px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5em; min-height: 48px; padding: .7em 1.2em;
+  border-radius: 999px; border: 1.5px solid transparent; font: 600 1rem/1 var(--font); cursor: pointer; text-decoration: none; }
+.btn[disabled] { opacity: .6; cursor: wait; }
+.btn-blue { background: var(--blue); color: var(--on-blue); }
+.btn-line { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn-small { min-height: 40px; padding: .5em 1em; font-size: .9rem; }
+
+.logo { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+.logo-mark, .logo-word { display: block; background: currentColor; -webkit-mask: var(--m) no-repeat center / contain; mask: var(--m) no-repeat center / contain; }
+.logo-mark { --m: url(img/logo-mark.png); width: 30px; height: 25px; }
+.logo-word { --m: url(img/logo-full.png); width: 118px; height: 9px; }
+.head { border-bottom: 1px solid var(--line); }
+.head-row { display: flex; align-items: center; gap: 12px; min-height: 60px; }
+.head-row .tag { font-size: .8rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--blue-ink); }
+.head-row .btn { margin-left: auto; }
+
+main { padding-block: 20px 48px; }
+h1 { font-size: 1.9rem; line-height: 1.05; letter-spacing: -.03em; font-weight: 800; margin: 4px 0 10px; }
+p { margin: 0 0 14px; }
+.muted { color: var(--ink-2); font-size: .95rem; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+.field label, .label { font-size: .9rem; font-weight: 600; }
+input, select { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px;
+  padding: 11px 12px; width: 100%; min-height: 48px; }
+input:focus, select:focus { outline: none; border-color: var(--blue); }
+.row { display: flex; gap: 8px; }
+.row > :first-child { flex: 1; min-width: 0; }
+.error { padding: 12px 14px; border-radius: 10px; background: var(--error-bg); color: var(--error-ink); margin-bottom: 14px; }
+
+.cam { position: relative; aspect-ratio: 4 / 3; background: #050B1E; border-radius: var(--radius); overflow: hidden; margin: 6px 0 10px; }
+.cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cam .aim { position: absolute; inset: 14% 24%; border: 3px solid rgba(255,255,255,.85); border-radius: 16px;
+  box-shadow: 0 0 0 999px rgba(5,11,30,.35); pointer-events: none; }
+.cam-idle { position: absolute; inset: 0; display: grid; place-content: center; gap: 12px; text-align: center; padding: 20px; color: #ECE9E2; }
+.cam-idle p { margin: 0; font-size: .95rem; color: #C9CFE3; max-width: 26em; }
+.cam-tools { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 12px; }
+
+.last { border-radius: var(--radius); padding: 14px 16px; font-weight: 700; font-size: 1.1rem; margin-bottom: 14px;
+  background: var(--surface); border: 1px solid var(--line); overflow-wrap: anywhere; }
+.last.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: transparent; }
+.last.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: transparent; }
+.last.error { background: var(--error-bg); color: var(--error-ink); border-color: transparent; }
+.last small { display: block; font-weight: 400; font-size: .9rem; margin-top: 2px; }
+
+.counts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 18px 0 8px; font-size: .95rem; color: var(--ink-2); }
+.counts b { color: var(--ink); font-size: 1.15rem; }
+.list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.list li { display: grid; grid-template-columns: 28px 1fr auto; gap: 4px 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.list .icon { font-weight: 800; text-align: center; line-height: 1.5; }
+.list .sn { font-weight: 700; overflow-wrap: anywhere; }
+.list .msg { grid-column: 2 / 4; font-size: .9rem; color: var(--ink-2); }
+.list .ok .icon { color: var(--ok-ink); }
+.list .warn .icon { color: var(--warn-ink); }
+.list .error .icon, .list .error .msg { color: var(--error-ink); }
+.list .wait .icon { color: var(--wait-ink); }
+.list button { font: 600 .85rem var(--font); background: none; border: 1.5px solid var(--line); color: var(--ink); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+<header class="head">
+  <div class="wrap head-row">
+    <a class="logo" href="./" aria-label="Anant Energies home"><span class="logo-mark"></span><span class="logo-word"></span></a>
+    <span class="tag">Staff</span>
+    <button class="btn btn-line btn-small" id="signOut" type="button" hidden>Sign out</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="signin">
+    <h1>Dispatch scanning</h1>
+    <p class="muted">Scan each battery's QR code as it leaves the factory. The sheet records the dispatch date and the dealer, so the registration window starts from the real dispatch day.</p>
+    <form class="panel" id="pinForm" novalidate>
+      <div class="field">
+        <label for="pin">Staff PIN</label>
+        <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12">
+      </div>
+      <div class="error" id="pinError" role="alert" hidden></div>
+      <button class="btn btn-blue" type="submit" id="pinBtn" style="width:100%">Open scanner</button>
+    </form>
+  </section>
+
+  <section id="scanner" hidden>
+    <div class="field">
+      <label for="dealer">Dealer receiving these packs</label>
+      <div class="row">
+        <select id="dealer"><option value="">Choose a dealer</option></select>
+        <button class="btn btn-line btn-small" id="reloadDealers" type="button">Reload list</button>
+      </div>
+    </div>
+
+    <div class="cam">
+      <video id="video" playsinline muted></video>
+      <div class="aim" id="aim" hidden></div>
+      <div class="cam-idle" id="camIdle">
+        <button class="btn btn-blue" id="camStart" type="button">Start camera</button>
+        <p id="camMsg">Point the camera at the QR code on the battery. Each pack is recorded once.</p>
+      </div>
+    </div>
+    <div class="cam-tools">
+      <button class="btn btn-line btn-small" id="torch" type="button" hidden>Light on</button>
+      <button class="btn btn-line btn-small" id="camStop" type="button" hidden>Stop camera</button>
+    </div>
+
+    <div class="last" id="last" role="status">Choose the dealer, then scan.</div>
+
+    <form id="manualForm" novalidate>
+      <div class="field">
+        <label for="manual">No camera? Type the pack number, or use a USB scanner here</label>
+        <div class="row">
+          <input id="manual" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="300">
+          <button class="btn btn-line" type="submit">Add</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="counts" id="counts"></div>
+    <ol class="list" id="list"></ol>
+  </section>
+</main>
+
+<script src="js/warranty-config.js"></script>
+<script>
+  (function () {
+    var CONFIG = window.WARRANTY_CONFIG || {};
+    var $ = function (id) { return document.getElementById(id); };
+    var video = $('video');
+
+    function load(area, key) { try { return window[area].getItem(key) || ''; } catch (e) { return ''; } }
+    function save(area, key, value) {
+      try { if (value) window[area].setItem(key, value); else window[area].removeItem(key); } catch (e) { /* private mode */ }
+    }
+
+    var pin = load('sessionStorage', 'anantDispatchPin');
+    var items = [];          // newest first
+    var queue = [];          // waiting to be sent, oldest first
+    var sending = false, needPin = false, retryTimer = null, retryDelay = 2000;
+    var lastSeen = {};       // pack -> time it was last in front of the camera
+
+    function post(body) {
+      var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 30000) : null;
+      return fetch(CONFIG.backendUrl, {
+        method: 'POST', body: JSON.stringify(body), redirect: 'follow', signal: ctrl ? ctrl.signal : undefined
+      }).then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      }).finally(function () { if (timer) clearTimeout(timer); });
+    }
+
+    // ---- Sign in ---------------------------------------------------------
+    function pinError(message) {
+      $('pinError').textContent = message;
+      $('pinError').hidden = !message;
+    }
+
+    function showSignIn(message) {
+      stopCamera();
+      $('scanner').hidden = true;
+      $('signOut').hidden = true;
+      $('signin').hidden = false;
+      pinError(message || '');
+      $('pin').value = '';
+    }
+
+    function fillDealers(names) {
+      var select = $('dealer'), wanted = select.value || load('localStorage', 'anantDispatchDealer');
+      select.length = 1;
+      names.forEach(function (n) { select.add(new Option(n, n)); });
+      select.value = names.indexOf(wanted) !== -1 ? wanted : '';
+      if (!names.length) flash('error', 'No dealers yet.', 'Add your dealers to the Dealers tab in the sheet, then tap Reload list.');
+    }
+
+    function loadDealers(p) {
+      return post({ action: 'dealers', pin: p }).then(function (res) {
+        if (!res || !res.ok) {
+          var err = new Error((res && res.message) || 'Could not open the scanner.');
+          err.code = res && res.code;
+          throw err;
+        }
+        pin = p;
+        save('sessionStorage', 'anantDispatchPin', p);
+        fillDealers(res.dealers || []);
+      });
+    }
+
+    function backendReady() { return /^https:\/\//.test(CONFIG.backendUrl || ''); }
+
+    $('pinForm').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var value = $('pin').value.trim();
+      pinError('');
+      if (!backendReady()) return pinError('The backend address is not filled in yet. Paste the Web app URL into js/warranty-config.js.');
+      if (!value) return pinError('Enter the staff PIN.');
+      $('pinBtn').disabled = true;
+      loadDealers(value).then(function () {
+        needPin = false;
+        $('signin').hidden = true;
+        $('scanner').hidden = false;
+        $('signOut').hidden = false;
+        if (!$('last').className.match(/error/)) flash('', $('dealer').value ? 'Ready. Scan a pack.' : 'Choose the dealer, then scan.');
+        render();
+        pump();
+      }, function (err) {
+        pinError(err.code ? err.message : 'Could not reach the server. Check the internet connection and try again.');
+      }).then(function () { $('pinBtn').disabled = false; });
+    });
+
+    $('signOut').addEventListener('click', function () {
+      if (queue.length && !confirm(queue.length + ' scans are not sent yet. Sign out anyway?')) return;
+      queue.forEach(function (item) { item.state = 'error'; item.text = 'Not sent. You signed out before it was sent.'; });
+      queue = [];
+      render();
+      pin = '';
+      save('sessionStorage', 'anantDispatchPin', '');
+      showSignIn('');
+    });
+
+    $('reloadDealers').addEventListener('click', function () {
+      var btn = this;
+      btn.disabled = true;
+      loadDealers(pin).then(function () {
+        flash('', 'Dealer list updated.');
+      }, function (err) {
+        if (/PIN/.test(err.code || '')) showSignIn(err.message);
+        else flash('error', 'Could not reload the dealer list.', err.code ? err.message : 'No connection. Try again.');
+      }).then(function () { btn.disabled = false; });
+    });
+
+    $('dealer').addEventListener('change', function () {
+      save('localStorage', 'anantDispatchDealer', this.value);
+      flash('', this.value ? 'Scanning for ' + this.value + '.' : 'Choose the dealer, then scan.');
+    });
+
+    // ---- Scans -----------------------------------------------------------
+    // The battery QR holds https://anantenergies.tech/warranty.html?sn=PACK.
+    // A plain pack number (typed, or from a USB scanner) works too.
+    function packFrom(text) {
+      var t = String(text || '').trim();
+      if (/^https?:\/\//i.test(t)) {
+        try {
+          var u = new URL(t);
+          return (u.searchParams.get('sn') || u.searchParams.get('serial') || '').trim().toUpperCase();
+        } catch (e) { return ''; }
+      }
+      return t.toUpperCase();
+    }
+    function keyOf(pack) { return pack.replace(/[^A-Z0-9]/g, ''); }
+
+    function handleScan(text, fromCamera) {
+      var pack = packFrom(text), key = keyOf(pack), now = Date.now();
+      if (fromCamera && key && lastSeen[key] && now - lastSeen[key] < 4000) { lastSeen[key] = now; return; }
+      if (key) lastSeen[key] = now;
+      if (!key || pack.length > 40) { flash('error', 'No pack number in this code.', 'Scan the QR code on the battery label.'); buzz('error'); return; }
+      var dealer = $('dealer').value;
+      if (!dealer) { flash('error', 'Choose the dealer first.', 'Then scan ' + pack + ' again.'); buzz('error'); $('dealer').focus(); return; }
+
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        if (it.key === key && it.dealer === dealer) {
+          if (it.state === 'error') { items.splice(i, 1); break; }   // scanned again after a problem: try again
+          flash(it.state === 'ok' ? 'ok' : '', pack + ' is already in the list.', it.state === 'ok' ? it.text : 'Still sending.');
+          buzz('same');
+          return;
+        }
+      }
+      var item = { key: key, pack: pack, dealer: dealer, state: 'wait', text: 'Sending…', model: '' };
+      items.unshift(item);
+      queue.push(item);
+      flash('', pack + ' scanned.', 'Sending to the sheet…');
+      buzz('ok');
+      render();
+      pump();
+    }
+
+    function pump() {
+      if (sending || needPin || !queue.length || retryTimer) return;
+      var item = queue[0];
+      sending = true;
+      post({ action: 'dispatch', pin: pin, serial: item.pack, dealer: item.dealer }).then(function (res) {
+        if (res && res.code === 'BUSY') return retryLater(item);
+        if (res && /^(WRONG_PIN|PIN_PAUSED|NO_PIN)$/.test(res.code)) {
+          needPin = true;
+          item.text = 'Waiting for the staff PIN.';
+          render();
+          showSignIn(res.message + ' Sign in again to send the remaining scans.');
+          return;
+        }
+        queue.shift();
+        retryDelay = 2000;
+        settle(item, res || {});
+      }, function () {
+        retryLater(item);
+      }).then(function () {
+        sending = false;
+        pump();
+      });
+    }
+
+    // No internet or the server is busy: keep the scan and try again, waiting a little longer each time.
+    function retryLater(item) {
+      item.text = 'Not sent yet. No connection, trying again…';
+      render();
+      retryTimer = setTimeout(function () { retryTimer = null; pump(); }, retryDelay);
+      retryDelay = Math.min(retryDelay * 2, 30000);
+    }
+    window.addEventListener('online', function () {
+      if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; retryDelay = 2000; pump(); }
+    });
+
+    function settle(item, res) {
+      item.model = res.model || '';
+      if (res.ok) {
+        item.state = res.status === 'UPDATED' ? 'warn' : 'ok';
+        item.text = res.status === 'ALREADY' ? 'Already recorded today for ' + item.dealer + '.'
+          : 'Recorded for ' + item.dealer + '.' + (res.message ? ' ' + res.message : '');
+      } else {
+        item.state = 'error';
+        item.text = res.message || 'Not recorded. Please scan again.';
+      }
+      if (items[0] === item) {
+        flash(item.state, item.pack + (item.state === 'error' ? ' not recorded.' : ' recorded.'), item.text);
+      }
+      if (item.state === 'error') buzz('error');
+      render();
+    }
+
+    function retryItem(item) {
+      items.splice(items.indexOf(item), 1);
+      handleScan(item.pack, false);
+    }
+
+    // ---- Display -----------------------------------------------------------
+    function flash(kind, title, detail) {
+      var box = $('last');
+      box.className = 'last' + (kind ? ' ' + kind : '');
+      box.textContent = title;
+      if (detail) {
+        var small = document.createElement('small');
+        small.textContent = detail;
+        box.appendChild(small);
+      }
+    }
+
+    var ICON = { ok: '✓', warn: '!', error: '✕', wait: '…' };
+    function render() {
+      var list = $('list'), done = 0, waiting = 0, problems = 0;
+      list.textContent = '';
+      items.forEach(function (item, index) {
+        if (item.state === 'ok' || item.state === 'warn') done++;
+        else if (item.state === 'wait') waiting++;
+        else problems++;
+        if (index >= 300) return;
+        var li = document.createElement('li');
+        li.className = item.state;
+        var icon = document.createElement('span'); icon.className = 'icon'; icon.textContent = ICON[item.state];
+        var sn = document.createElement('span'); sn.className = 'sn';
+        sn.textContent = item.pack + (item.model ? ' · ' + item.model : '');
+        var action = document.createElement('span');
+        if (item.state === 'error') {
+          var again = document.createElement('button');
+          again.type = 'button'; again.textContent = 'Try again';
+          again.addEventListener('click', function () { retryItem(item); });
+          action.appendChild(again);
+        }
+        var msg = document.createElement('span'); msg.className = 'msg';
+        msg.textContent = item.state === 'ok' || item.state === 'warn' ? item.text : item.dealer + ' · ' + item.text;
+        li.appendChild(icon); li.appendChild(sn); li.appendChild(action); li.appendChild(msg);
+        list.appendChild(li);
+      });
+      var counts = $('counts');
+      counts.textContent = '';
+      [[done, 'recorded'], [waiting, 'sending'], [problems, 'problems']].forEach(function (c) {
+        if (!c[0] && c[1] !== 'recorded') return;
+        var span = document.createElement('span');
+        var b = document.createElement('b'); b.textContent = c[0];
+        span.appendChild(b); span.appendChild(document.createTextNode(' ' + c[1]));
+        counts.appendChild(span);
+      });
+    }
+
+    window.addEventListener('beforeunload', function (ev) {
+      if (queue.length) { ev.preventDefault(); ev.returnValue = ''; }
+    });
+
+    $('manualForm').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var input = $('manual');
+      if (input.value.trim()) handleScan(input.value, false);
+      input.value = '';
+      input.focus();
+    });
+
+    // ---- Sound and vibration ---------------------------------------------
+    var audio = null;
+    function unlockAudio() {
+      try {
+        audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+        if (audio.state === 'suspended') audio.resume();
+      } catch (e) { audio = null; }
+    }
+    function beep(freq, ms) {
+      if (!audio) return;
+      try {
+        var osc = audio.createOscillator(), gain = audio.createGain();
+        osc.frequency.value = freq;
+        gain.gain.value = 0.12;
+        osc.connect(gain); gain.connect(audio.destination);
+        osc.start(); osc.stop(audio.currentTime + ms / 1000);
+      } catch (e) { /* no sound */ }
+    }
+    function buzz(kind) {
+      var vibrate = navigator.vibrate ? navigator.vibrate.bind(navigator) : function () {};
+      if (kind === 'ok') { beep(1320, 90); vibrate(60); }
+      else if (kind === 'same') { beep(880, 50); }
+      else { beep(260, 300); vibrate([90, 60, 90]); }
+    }
+    document.addEventListener('pointerdown', unlockAudio, { once: true });
+
+    // ---- Camera ------------------------------------------------------------
+    var stream = null, scanning = false, torchOn = false;
+
+    function camMessage(text) { $('camMsg').textContent = text; }
+
+    function loadScript(src) {
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src; s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    // Chrome on Android reads QR codes natively. Other browsers (iPhone) use jsQR.
+    function getDecoder() {
+      var native = !('BarcodeDetector' in window) ? Promise.reject(new Error('none'))
+        : Promise.resolve(window.BarcodeDetector.getSupportedFormats ? window.BarcodeDetector.getSupportedFormats() : ['qr_code'])
+          .then(function (formats) {
+            if (formats.indexOf('qr_code') === -1) throw new Error('no qr_code');
+            var detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+            return function () {
+              return detector.detect(video).then(function (codes) { return codes.length ? codes[0].rawValue : null; });
+            };
+          });
+      return native.catch(function () {
+        return (window.jsQR ? Promise.resolve() : loadScript('js/jsQR.min.js')).then(function () {
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d', { willReadFrequently: true });
+          return function () {
+            var w = video.videoWidth, h = video.videoHeight;
+            if (!w || !h) return Promise.resolve(null);
+            var scale = Math.min(1, 800 / Math.max(w, h));
+            canvas.width = Math.round(w * scale);
+            canvas.height = Math.round(h * scale);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var found = window.jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
+            return Promise.resolve(found ? found.data : null);
+          };
+        });
+      });
+    }
+
+    function scanLoop(decode) {
+      if (!scanning) return;
+      decode().then(function (text) { if (text && scanning) handleScan(text, true); }, function () { /* frame not ready */ })
+        .then(function () { if (scanning) setTimeout(function () { scanLoop(decode); }, 120); });
+    }
+
+    function startCamera() {
+      unlockAudio();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        camMessage('This browser cannot use the camera on this page. Use Chrome on Android or Safari on iPhone, and open the page with https://. You can still type pack numbers below.');
+        return;
+      }
+      $('camStart').disabled = true;
+      camMessage('Starting the camera…');
+      navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      }).then(function (s) {
+        stream = s;
+        video.srcObject = s;
+        return video.play();
+      }).then(getDecoder).then(function (decode) {
+        scanning = true;
+        $('camIdle').hidden = true;
+        $('aim').hidden = false;
+        $('camStop').hidden = false;
+        var track = stream.getVideoTracks()[0];
+        var caps = track && track.getCapabilities ? track.getCapabilities() : {};
+        $('torch').hidden = !caps.torch;
+        scanLoop(decode);
+      }).catch(function (err) {
+        stopCamera();
+        camMessage(err && err.name === 'NotAllowedError'
+          ? 'Camera permission was refused. Allow the camera for this site in the browser settings, then tap Start camera.'
+          : 'Could not start the camera. Close other apps that use it and try again, or type pack numbers below.');
+      }).then(function () { $('camStart').disabled = false; });
+    }
+
+    function stopCamera() {
+      scanning = false;
+      torchOn = false;
+      $('torch').textContent = 'Light on';
+      if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+      stream = null;
+      video.srcObject = null;
+      $('camIdle').hidden = false;
+      $('aim').hidden = true;
+      $('camStop').hidden = true;
+      $('torch').hidden = true;
+    }
+
+    $('camStart').addEventListener('click', startCamera);
+    $('camStop').addEventListener('click', function () {
+      stopCamera();
+      camMessage('Camera stopped. Tap Start camera to scan again.');
+    });
+    $('torch').addEventListener('click', function () {
+      var track = stream && stream.getVideoTracks()[0];
+      if (!track) return;
+      torchOn = !torchOn;
+      track.applyConstraints({ advanced: [{ torch: torchOn }] }).catch(function () { torchOn = false; });
+      this.textContent = torchOn ? 'Light off' : 'Light on';
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden && scanning) {
+        stopCamera();
+        camMessage('Camera paused while the page was hidden. Tap Start camera to continue.');
+      }
+    });
+
+    // ---- Start -------------------------------------------------------------
+    render();
+    if (pin && backendReady()) {
+      loadDealers(pin).then(function () {
+        $('signin').hidden = true;
+        $('scanner').hidden = false;
+        $('signOut').hidden = false;
+        flash('', $('dealer').value ? 'Ready. Scan a pack.' : 'Choose the dealer, then scan.');
+      }, function (err) { showSignIn(err.code ? err.message : ''); });
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Billing · Anant Energies</title>
+<meta name="theme-color" content="#0D1838">
+<link rel="icon" href="img/favicon.png">
+<style>
+/* Staff billing page (tax invoices and proformas). Not linked from the website. Same look as dispatch.html. */
+:root {
+  --bg: #ECE9E2; --surface: #F6F4EF; --ink: #0D1838; --ink-2: #4A5372; --line: #D3CEC2;
+  --blue: #2253ED; --blue-ink: #1A3FB8; --on-blue: #FFFFFF; --cyan: #46C3D6;
+  --ok-bg: #DDF1E6; --ok-ink: #11683A; --warn-bg: #FFF1D6; --warn-ink: #8A5300;
+  --error-bg: #FBE7E6; --error-ink: #A3161A; --wait-ink: #4A5372;
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif; --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #080F26; --surface: #0F1A3A; --ink: #ECE9E2; --ink-2: #A3ABC6; --line: #24305A;
+    --blue: #4C78FF; --blue-ink: #8EA8FF; color-scheme: dark;
+    --ok-bg: #0E2E22; --ok-ink: #7FE0AA; --warn-bg: #33270C; --warn-ink: #FFD27A;
+    --error-bg: #3A1520; --error-ink: #FFB3B3; --wait-ink: #A3ABC6;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 640px; margin-inline: auto; padding-inline: 16px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5em; min-height: 48px; padding: .7em 1.2em;
+  border-radius: 999px; border: 1.5px solid transparent; font: 600 1rem/1 var(--font); cursor: pointer; text-decoration: none; }
+.btn[disabled] { opacity: .6; cursor: wait; }
+.btn-blue { background: var(--blue); color: var(--on-blue); }
+.btn-line { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn-small { min-height: 40px; padding: .5em 1em; font-size: .9rem; }
+
+.logo { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+.logo-mark, .logo-word { display: block; background: currentColor; -webkit-mask: var(--m) no-repeat center / contain; mask: var(--m) no-repeat center / contain; }
+.logo-mark { --m: url(img/logo-mark.png); width: 30px; height: 25px; }
+.logo-word { --m: url(img/logo-full.png); width: 118px; height: 9px; }
+.head { border-bottom: 1px solid var(--line); }
+.head-row { display: flex; align-items: center; gap: 12px; min-height: 60px; }
+.head-row .tag { font-size: .8rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--blue-ink); }
+.head-row .btn { margin-left: auto; }
+
+main { padding-block: 20px 48px; }
+h1 { font-size: 1.9rem; line-height: 1.05; letter-spacing: -.03em; font-weight: 800; margin: 4px 0 10px; }
+p { margin: 0 0 14px; }
+.muted { color: var(--ink-2); font-size: .95rem; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+.field label, .label { font-size: .9rem; font-weight: 600; }
+.field .hint { font-weight: 400; color: var(--ink-2); }
+input, select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px;
+  padding: 11px 12px; width: 100%; min-height: 48px; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--blue); }
+.row { display: flex; gap: 8px; }
+.row > :first-child { flex: 1; min-width: 0; }
+.error { padding: 12px 14px; border-radius: 10px; background: var(--error-bg); color: var(--error-ink); margin-bottom: 14px; }
+
+.cam { position: relative; aspect-ratio: 4 / 3; background: #050B1E; border-radius: var(--radius); overflow: hidden; margin: 6px 0 10px; }
+.cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cam .aim { position: absolute; inset: 14% 24%; border: 3px solid rgba(255,255,255,.85); border-radius: 16px;
+  box-shadow: 0 0 0 999px rgba(5,11,30,.35); pointer-events: none; }
+.cam-idle { position: absolute; inset: 0; display: grid; place-content: center; gap: 12px; text-align: center; padding: 20px; color: #ECE9E2; }
+.cam-idle p { margin: 0; font-size: .95rem; color: #C9CFE3; max-width: 26em; }
+.cam-tools { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 12px; }
+
+.last { border-radius: var(--radius); padding: 14px 16px; font-weight: 700; font-size: 1.1rem; margin-bottom: 14px;
+  background: var(--surface); border: 1px solid var(--line); overflow-wrap: anywhere; }
+.last.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: transparent; }
+.last.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: transparent; }
+.last.error { background: var(--error-bg); color: var(--error-ink); border-color: transparent; }
+.last small { display: block; font-weight: 400; font-size: .9rem; margin-top: 2px; }
+
+.counts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 18px 0 8px; font-size: .95rem; color: var(--ink-2); }
+.counts b { color: var(--ink); font-size: 1.15rem; }
+.list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.list li { display: grid; grid-template-columns: 28px 1fr auto; gap: 4px 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.list .icon { font-weight: 800; text-align: center; line-height: 1.5; }
+.list .sn { font-weight: 700; overflow-wrap: anywhere; }
+.list .msg { grid-column: 2 / 4; font-size: .9rem; color: var(--ink-2); }
+.list .line-model { grid-column: 2 / 4; min-height: 40px; padding: 6px 8px; font-size: .95rem; }
+.list .ok .icon { color: var(--ok-ink); }
+.list .warn .icon { color: var(--warn-ink); }
+.list .error .icon, .list .error .msg { color: var(--error-ink); }
+.list .wait .icon { color: var(--wait-ink); }
+.list button { font: 600 .85rem var(--font); background: none; border: 1.5px solid var(--line); color: var(--ink); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+h2 { font-size: 1.15rem; margin: 26px 0 8px; letter-spacing: -.01em; }
+textarea { resize: vertical; min-height: 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.muted.bad { color: var(--error-ink); }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 999px; background: var(--surface);
+  border: 1px solid var(--line); margin: 4px 0 16px; }
+.tabs button { font: 700 .95rem var(--font); min-height: 44px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--blue); color: var(--on-blue); }
+.panel.slim { padding: 14px; margin-bottom: 6px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+@media (max-width: 420px) { .two { grid-template-columns: 1fr; } }
+.check { display: flex; gap: 10px; align-items: center; font-weight: 600; font-size: .95rem; margin-bottom: 6px; }
+.check input { width: 22px; min-height: 22px; height: 22px; }
+.price-row { display: grid; grid-template-columns: 1fr 10.5em; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.price-cells { display: grid; gap: 6px; }
+.price-cells select { padding: 9px 8px; min-height: 44px; }
+.price-row label { overflow-wrap: anywhere; }
+.item { padding: 10px 0; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+.item-row { display: grid; grid-template-columns: 1fr 4.2em 1.3fr 1.5fr auto; gap: 6px; align-items: center; }
+.item-row input, .item-row select { padding: 9px 8px; min-height: 44px; }
+@media (max-width: 420px) { .item-row { grid-template-columns: 1fr 1fr 1fr; } }
+.mini { display: grid; gap: 2px; font-size: .75rem; font-weight: 600; color: var(--ink-2); }
+.mini input, .mini select { font-size: 1rem; font-weight: 400; color: var(--ink); }
+.item-row .small-btn { align-self: end; min-height: 44px; }
+.small-btn, .list button { font: 600 .85rem var(--font); background: none; border: 1.5px solid var(--line); color: var(--ink); border-radius: 999px; padding: 6px 10px; cursor: pointer; }
+#addItem { margin-top: 10px; }
+.qty-cell { display: flex; gap: 8px; align-items: center; }
+.qty-cell .qty { width: 5em; min-height: 40px; padding: 6px 8px; }
+.totals { margin: 22px 0 14px; }
+.tl { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.tl.big { font-weight: 800; font-size: 1.2rem; border-top: 1px solid var(--line); margin-top: 6px; padding-top: 8px; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0 0 16px; }
+.facts dt { color: var(--ink-2); }
+.facts dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.warnbox, .okbox { padding: 10px 12px; border-radius: 10px; background: var(--warn-bg); color: var(--warn-ink); margin: 10px 0 0; }
+.okbox { background: var(--ok-bg); color: var(--ok-ink); }
+.linkish { font: 700 .9rem var(--font); background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; }
+.actions { display: grid; gap: 10px; }
+</style>
+</head>
+<body>
+<header class="head">
+  <div class="wrap head-row">
+    <a class="logo" href="./" aria-label="Anant Energies home"><span class="logo-mark"></span><span class="logo-word"></span></a>
+    <span class="tag">Staff</span>
+    <button class="btn btn-line btn-small" id="signOut" type="button" hidden>Sign out</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="signin">
+    <h1>Billing</h1>
+    <p class="muted">Make tax invoices and proforma invoices (PI). An invoice records its battery packs as dispatched to the customer, and every PDF is saved in Google Drive.</p>
+    <form class="panel" id="pinForm" novalidate>
+      <div class="field">
+        <label for="pin">Staff PIN</label>
+        <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12">
+      </div>
+      <div class="error" id="pinError" role="alert" hidden></div>
+      <button class="btn btn-blue" type="submit" id="pinBtn" style="width:100%">Open</button>
+    </form>
+  </section>
+
+  <section id="maker" hidden>
+    <div class="tabs" role="tablist" aria-label="Document">
+      <button type="button" role="tab" id="tabInvoice" data-mode="invoice">Tax invoice</button>
+      <button type="button" role="tab" id="tabProforma" data-mode="proforma">Proforma (PI)</button>
+    </div>
+    <div class="error" id="setupProblem" role="alert" hidden></div>
+
+    <div id="fromPi" class="panel slim">
+      <div class="field" id="piPickField" style="margin:0">
+        <label for="piPick">Making the invoice for a proforma? (optional)</label>
+        <select id="piPick"><option value="">Choose a pending proforma</option></select>
+      </div>
+      <div id="piInfo" hidden></div>
+    </div>
+
+    <h2>Bill to</h2>
+    <div class="field">
+      <label for="dealer" class="sr">Bill to</label>
+      <div class="row">
+        <select id="dealer"><option value="">Choose a customer or dealer</option></select>
+        <button class="btn btn-line btn-small" id="reloadInfo" type="button">Reload list</button>
+      </div>
+      <div class="muted" id="dealerInfo"></div>
+    </div>
+    <div id="newCustomer" class="panel slim" hidden>
+      <div class="field"><label for="ncName">Name</label><input id="ncName" maxlength="80" autocomplete="off"></div>
+      <div class="two">
+        <div class="field"><label for="ncPhone">Phone</label><input id="ncPhone" inputmode="tel" maxlength="16" autocomplete="off"></div>
+        <div class="field"><label for="ncGstin">GSTIN (if any)</label><input id="ncGstin" maxlength="15" autocapitalize="characters" autocomplete="off" spellcheck="false"></div>
+      </div>
+      <div class="field"><label for="ncAddress">Address</label><textarea id="ncAddress" rows="2" maxlength="300"></textarea></div>
+      <div class="field" style="margin:0"><label for="ncState">State</label><select id="ncState"></select></div>
+    </div>
+
+    <div id="scanPart">
+      <h2>Battery packs</h2>
+      <div class="cam">
+        <video id="video" playsinline muted></video>
+        <div class="aim" id="aim" hidden></div>
+        <div class="cam-idle" id="camIdle">
+          <button class="btn btn-blue" id="camStart" type="button">Start camera</button>
+          <p id="camMsg">Point the camera at the QR code on each battery. Each pack is added once.</p>
+        </div>
+      </div>
+      <div class="cam-tools">
+        <button class="btn btn-line btn-small" id="torch" type="button" hidden>Light on</button>
+        <button class="btn btn-line btn-small" id="camStop" type="button" hidden>Stop camera</button>
+      </div>
+      <div class="field" id="stockPart" hidden>
+        <label for="stockModel">Model for stock packs <span class="hint">· labels printed without a model</span></label>
+        <select id="stockModel"><option value="">Choose the model</option></select>
+      </div>
+      <div class="last" id="last" role="status">Choose who this is billed to, then scan the packs.</div>
+      <form id="manualForm" novalidate>
+        <div class="field">
+          <label for="manual">No camera? Type the pack number, or use a USB scanner here</label>
+          <div class="row">
+            <input id="manual" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="300">
+            <button class="btn btn-line" type="submit">Add</button>
+          </div>
+        </div>
+      </form>
+      <div class="counts" id="counts"></div>
+      <ol class="list" id="list"></ol>
+    </div>
+
+    <div id="modelPart" hidden>
+      <h2>Batteries</h2>
+      <div class="row">
+        <select id="pickModel"><option value="">Choose a model</option></select>
+        <input id="pickQty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="Quantity" style="width:5.5em;flex:none">
+        <button class="btn btn-line btn-small" id="addModel" type="button">Add</button>
+      </div>
+      <ol class="list" id="batteryList" style="margin-top:10px"></ol>
+    </div>
+
+    <h2>Prices and warranty</h2>
+    <label class="check"><input type="checkbox" id="inclusive"> Prices I type include GST</label>
+    <div id="models"></div>
+    <p class="muted" id="noModels">Battery prices and warranty terms appear here once you add batteries.</p>
+
+    <h2>Other items</h2>
+    <p class="muted">Chargers, inverters, accessories or service. Leave empty if there are none.</p>
+    <div id="items"></div>
+    <button class="btn btn-line btn-small" id="addItem" type="button">Add an item</button>
+
+    <h2>Charger and notes</h2>
+    <div class="two">
+      <div class="field"><label for="chargerModel">Charger model (optional)</label><input id="chargerModel" maxlength="100" autocomplete="off"></div>
+      <div class="field"><label for="chargerSerial">Charger Sr. No. (optional)</label><input id="chargerSerial" maxlength="200" autocomplete="off"></div>
+    </div>
+    <div class="field"><label for="notes">Notes printed on the document (optional)</label><textarea id="notes" rows="2" maxlength="600"></textarea></div>
+
+    <div class="totals panel" id="totals"></div>
+    <div class="error" id="createError" role="alert" hidden></div>
+    <button class="btn btn-blue" type="button" id="create" style="width:100%">Create invoice</button>
+    <button class="btn btn-line btn-small" type="button" id="clear" style="width:100%;margin-top:10px">Clear this form</button>
+  </section>
+
+  <section id="done" hidden>
+    <div class="last ok" id="doneTitle"></div>
+    <div class="panel">
+      <dl class="facts">
+        <dt id="outNoLabel">Invoice no.</dt><dd id="outNo"></dd>
+        <dt>Bill to</dt><dd id="outDealer"></dd>
+        <dt id="outPacksLabel">Packs</dt><dd id="outPacks"></dd>
+        <dt>Total</dt><dd id="outTotal"></dd>
+      </dl>
+      <p class="warnbox" id="outNote" hidden></p>
+      <div class="actions">
+        <a class="btn btn-blue" id="openPdf" target="_blank" rel="noopener">Open PDF</a>
+        <a class="btn btn-line" id="whatsapp" target="_blank" rel="noopener">Send on WhatsApp</a>
+        <button class="btn btn-line" type="button" id="newInvoice">Make another</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/warranty-config.js"></script>
+<script>
+  (function () {
+    var CONFIG = window.WARRANTY_CONFIG || {};
+    var $ = function (id) { return document.getElementById(id); };
+    var video = $('video');
+    var NEW = '__new';
+
+    function load(area, key) { try { return window[area].getItem(key) || ''; } catch (e) { return ''; } }
+    function save(area, key, value) {
+      try { if (value) window[area].setItem(key, value); else window[area].removeItem(key); } catch (e) { /* private mode */ }
+    }
+    function el(tag, props, kids) {
+      var n = document.createElement(tag);
+      Object.keys(props || {}).forEach(function (k) {
+        if (k === 'text') n.textContent = props[k];
+        else if (k === 'className') n.className = props[k];
+        else if (k.indexOf('data-') === 0 || k.indexOf('aria-') === 0) n.setAttribute(k, props[k]);
+        else n[k] = props[k];
+      });
+      (kids || []).forEach(function (c) { if (c) n.appendChild(c); });
+      return n;
+    }
+
+    // Same sign-in as the dispatch page.
+    var pin = load('sessionStorage', 'anantDispatchPin');
+    var info = { dealers: [], models: [], rates: [5, 18], states: [], setupProblem: '', business: {} };
+    var lastSeen = {};       // pack -> time it was last in front of the camera
+    var busy = false;
+
+    // What is being made. Each kind keeps its own form in this phone's storage, so a reload loses nothing.
+    var mode = load('localStorage', 'anantBillingMode') === 'proforma' ? 'proforma' : 'invoice';
+    var drafts = { invoice: readDraft('invoice'), proforma: readDraft('proforma') };
+    var draft = drafts[mode];
+
+    function newDraft() {
+      return { dealer: '', newCustomer: {}, packs: [], batteries: [], prices: {}, terms: {}, inclusive: false, items: [],
+        notes: '', chargerModel: '', chargerSerial: '', proforma: null, stockModel: '', requestId: makeId() };
+    }
+    function makeId() {
+      var a = new Uint8Array(12);
+      (window.crypto || window.msCrypto).getRandomValues(a);
+      return Array.prototype.map.call(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+    }
+    function readDraft(kind) {
+      try {
+        var d = JSON.parse(load('localStorage', kind === 'proforma' ? 'anantProformaDraft' : 'anantInvoiceDraft'));
+        if (d && Array.isArray(d.packs)) {
+          var fresh = newDraft();
+          Object.keys(fresh).forEach(function (k) { if (!(k in d)) d[k] = fresh[k]; });
+          return d;
+        }
+      } catch (e) { /* no draft */ }
+      return newDraft();
+    }
+    function saveDraft() {
+      save('localStorage', mode === 'proforma' ? 'anantProformaDraft' : 'anantInvoiceDraft', JSON.stringify(draft));
+    }
+
+    function post(body) {
+      var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 60000) : null;
+      return fetch(CONFIG.backendUrl, {
+        method: 'POST', body: JSON.stringify(body), redirect: 'follow', signal: ctrl ? ctrl.signal : undefined
+      }).then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      }).finally(function () { if (timer) clearTimeout(timer); });
+    }
+    function isPinProblem(res) { return res && /^(WRONG_PIN|PIN_PAUSED|NO_PIN)$/.test(res.code); }
+
+    function money(n) {
+      return '₹' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function round2(n) { return Math.round(n * 100) / 100; }
+    function product(model) { return info.models.filter(function (x) { return x.model === model; })[0] || null; }
+    function rateOf(model) { var m = product(model); return m ? Number(m.rate) || 0 : 18; }
+    // Warranty term for a model on this document, in years: "2+2" is 2 years warranty + 2 years service warranty.
+    function termOf(model) { var m = product(model); return draft.terms[model] || (m && m.term) || ''; }
+    function termName(t) { return t + (t === '1' ? ' yr' : ' yrs'); }
+
+    // ---- Sign in ---------------------------------------------------------
+    function pinError(message) {
+      $('pinError').textContent = message;
+      $('pinError').hidden = !message;
+    }
+
+    function showSignIn(message) {
+      stopCamera();
+      $('maker').hidden = true;
+      $('done').hidden = true;
+      $('signOut').hidden = true;
+      $('signin').hidden = false;
+      pinError(message || '');
+      $('pin').value = '';
+    }
+
+    function loadInfo(p) {
+      return post({ action: 'invoiceInfo', pin: p }).then(function (res) {
+        if (!res || !res.ok) {
+          var err = new Error((res && res.message) || 'Could not open the billing page.');
+          err.code = res && res.code;
+          throw err;
+        }
+        pin = p;
+        save('sessionStorage', 'anantDispatchPin', p);
+        info = res;
+        info.rates = res.rates && res.rates.length ? res.rates : [5, 18];
+        fillLists();
+        $('setupProblem').textContent = res.setupProblem || '';
+        $('setupProblem').hidden = !res.setupProblem;
+        showForm();
+      });
+    }
+
+    function fillLists() {
+      var select = $('dealer');
+      select.length = 1;
+      info.dealers.forEach(function (d) { select.add(new Option(d.name + (d.city ? ' · ' + d.city : ''), d.name)); });
+      select.add(new Option('+ New customer', NEW));
+      [$('pickModel'), $('stockModel')].forEach(function (pick) {
+        pick.length = 1;
+        info.models.forEach(function (m) { pick.add(new Option(m.model, m.model)); });
+      });
+      fillPiList();
+      var states = $('ncState');
+      states.length = 0;
+      (info.states || []).forEach(function (s) { states.add(new Option(s, s)); });
+      if (!info.dealers.length) flash('', 'No dealers yet.', 'Choose + New customer, or add dealers to the Dealers tab in the sheet and tap Reload list.');
+    }
+
+    function backendReady() { return /^https:\/\//.test(CONFIG.backendUrl || ''); }
+
+    function openMaker() {
+      $('signin').hidden = true;
+      $('done').hidden = true;
+      $('maker').hidden = false;
+      $('signOut').hidden = false;
+      showForm();
+      recheckWaiting();
+    }
+
+    $('pinForm').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var value = $('pin').value.trim();
+      pinError('');
+      if (!backendReady()) return pinError('The backend address is not filled in yet. Paste the Web app URL into js/warranty-config.js.');
+      if (!value) return pinError('Enter the staff PIN.');
+      $('pinBtn').disabled = true;
+      loadInfo(value).then(openMaker, function (err) {
+        pinError(err.code ? err.message : 'Could not reach the server. Check the internet connection and try again.');
+      }).then(function () { $('pinBtn').disabled = false; });
+    });
+
+    $('signOut').addEventListener('click', function () {
+      pin = '';
+      save('sessionStorage', 'anantDispatchPin', '');
+      showSignIn('');
+    });
+
+    $('reloadInfo').addEventListener('click', function () {
+      var btn = this;
+      btn.disabled = true;
+      loadInfo(pin).then(function () {
+        flash('', 'Customers, prices and proformas updated.');
+      }, function (err) {
+        if (/PIN/.test(err.code || '')) showSignIn(err.message);
+        else flash('error', 'Could not reload.', err.code ? err.message : 'No connection. Try again.');
+      }).then(function () { btn.disabled = false; });
+    });
+
+    // ---- Invoice or proforma -------------------------------------------------
+    Array.prototype.forEach.call(document.querySelectorAll('[data-mode]'), function (tab) {
+      tab.addEventListener('click', function () {
+        if (busy || mode === this.getAttribute('data-mode')) return;
+        mode = this.getAttribute('data-mode');
+        save('localStorage', 'anantBillingMode', mode);
+        draft = drafts[mode];
+        if (mode === 'proforma') stopCamera();
+        $('createError').hidden = true;
+        showForm();
+      });
+    });
+
+    /** Puts the saved form on the page. */
+    function showForm() {
+      $('tabInvoice').setAttribute('aria-selected', String(mode === 'invoice'));
+      $('tabProforma').setAttribute('aria-selected', String(mode === 'proforma'));
+      $('fromPi').hidden = mode !== 'invoice';
+      $('scanPart').hidden = mode !== 'invoice';
+      $('modelPart').hidden = mode !== 'proforma';
+      var names = info.dealers.map(function (d) { return d.name; });
+      $('dealer').value = draft.dealer === NEW || names.indexOf(draft.dealer) !== -1 ? draft.dealer : '';
+      var c = draft.newCustomer || {};
+      $('ncName').value = c.name || '';
+      $('ncPhone').value = c.phone || '';
+      $('ncGstin').value = c.gstin || '';
+      $('ncAddress').value = c.address || '';
+      $('ncState').value = c.state || (info.business && info.business.state) || 'Jharkhand';
+      $('inclusive').checked = !!draft.inclusive;
+      $('notes').value = draft.notes || '';
+      $('chargerModel').value = draft.chargerModel || '';
+      $('chargerSerial').value = draft.chargerSerial || '';
+      $('piPick').value = '';
+      showDealer();
+      showPi();
+      renderItems();
+      render();
+      if (mode === 'invoice') flash('', draft.dealer ? 'Ready. Scan a pack.' : 'Choose who this is billed to, then scan the packs.');
+    }
+
+    // ---- Bill to -------------------------------------------------------------
+    function dealer() {
+      var name = $('dealer').value;
+      if (name === NEW) {
+        var c = draft.newCustomer || {};
+        return { name: (c.name || '').trim(), phone: c.phone || '', gstin: (c.gstin || '').toUpperCase().replace(/[^A-Z0-9]/g, ''),
+          state: c.state || '', isNew: true, problem: (c.name || '').trim().length < 2 ? 'Type the customer\'s name.' : '' };
+      }
+      return info.dealers.filter(function (d) { return d.name === name; })[0] || null;
+    }
+
+    function showDealer() {
+      var d = dealer(), box = $('dealerInfo');
+      $('newCustomer').hidden = $('dealer').value !== NEW;
+      box.className = 'muted';
+      if (!d || d.isNew) { box.textContent = ''; return; }
+      if (d.problem) { box.className = 'muted bad'; box.textContent = d.problem; return; }
+      box.textContent = [d.gstin ? 'GSTIN ' + d.gstin : 'No GSTIN', d.state, d.phone].filter(Boolean).join(' · ');
+    }
+
+    $('dealer').addEventListener('change', function () {
+      draft.dealer = this.value;
+      saveDraft();
+      showDealer();
+      if (mode === 'invoice' && this.value) flash('', 'Billing ' + (this.value === NEW ? 'a new customer' : this.value) + '. Scan the packs.');
+      render();
+    });
+    [['ncName', 'name'], ['ncPhone', 'phone'], ['ncGstin', 'gstin'], ['ncAddress', 'address'], ['ncState', 'state']].forEach(function (f) {
+      $(f[0]).addEventListener('input', function () {
+        draft.newCustomer = draft.newCustomer || {};
+        draft.newCustomer[f[1]] = this.value;
+        saveDraft();
+        showTotals();
+      });
+    });
+    [['notes', 'notes'], ['chargerModel', 'chargerModel'], ['chargerSerial', 'chargerSerial']].forEach(function (f) {
+      $(f[0]).addEventListener('input', function () { draft[f[1]] = this.value; saveDraft(); });
+    });
+
+    // ---- Proforma behind this invoice -----------------------------------------
+    // The proformas waiting for payment come with the page, so one is picked from a list instead of typing its number.
+    function fillPiList() {
+      var pick = $('piPick'), list = info.proformas || [];
+      pick.length = 1;
+      pick.options[0].text = list.length ? 'Choose a pending proforma' : 'No pending proformas';
+      list.forEach(function (p) {
+        var parts = [p.no, p.billTo];
+        if (p.packs) parts.push(p.packs + (p.packs === 1 ? ' pack' : ' packs'));
+        parts.push('₹' + Number(p.total || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }));
+        if (p.expired) parts.push('past its valid date');
+        pick.add(new Option(parts.join(' · '), p.no));
+      });
+      pick.disabled = !list.length;
+      pick.value = '';
+    }
+
+    $('piPick').addEventListener('change', function () {
+      var no = this.value, pick = this;
+      if (!no) return;
+      pick.disabled = true;
+      piMessage('Loading ' + no + '…', false);
+      post({ action: 'proformaGet', pin: pin, proformaNo: no }).then(function (res) {
+        if (isPinProblem(res)) { showSignIn(res.message); return; }
+        if (!res || !res.ok) { piMessage((res && res.message) || 'Could not load it.', true); return; }
+        if (draft.packs.length && !window.confirm('Fill this invoice from ' + res.proformaNo + '? The packs already scanned stay.')) {
+          showPi();
+          return;
+        }
+        var names = info.dealers.map(function (d) { return d.name; });
+        draft.proforma = { no: res.proformaNo, validUntil: res.validUntil, expired: res.expired, batteries: res.batteries };
+        if (names.indexOf(res.billTo) !== -1) draft.dealer = res.billTo;
+        draft.inclusive = false;   // proforma prices are saved before GST
+        draft.prices = {};
+        draft.terms = {};
+        res.batteries.forEach(function (b) { draft.prices[b.model] = b.price; if (b.warranty) draft.terms[b.model] = b.warranty; });
+        draft.items = res.items.map(function (it) { return { description: it.description, hsn: it.hsn, qty: it.qty, price: it.price, rate: it.rate }; });
+        draft.notes = res.notes || draft.notes;
+        draft.chargerModel = res.chargerModel || draft.chargerModel;
+        draft.chargerSerial = res.chargerSerial || draft.chargerSerial;
+        // A proforma for one model: its stock packs are that model. With several models you choose for each group of packs.
+        setStockModel(res.batteries.length === 1 ? res.batteries[0].model : '');
+        saveDraft();
+        showForm();
+        flash('', 'Loaded ' + res.proformaNo + '.', 'Now scan the packs for it.');
+      }, function () {
+        piMessage('No connection. Try again.', true);
+      }).then(function () { pick.disabled = !(info.proformas || []).length; pick.value = ''; });
+    });
+
+    function piMessage(text, bad) {
+      var box = $('piInfo');
+      box.hidden = false;
+      box.className = bad ? 'muted bad' : 'muted';
+      box.textContent = text;
+    }
+
+    function showPi() {
+      var box = $('piInfo'), pi = mode === 'invoice' ? draft.proforma : null;
+      box.textContent = '';
+      box.hidden = !pi;
+      $('piPickField').hidden = !!pi;
+      if (!pi) return;
+      box.className = pi.expired ? 'warnbox' : 'okbox';
+      box.appendChild(el('span', { text: 'From ' + pi.no + (pi.expired ? ' · its valid date (' + pi.validUntil + ') has passed' : ' · valid until ' + pi.validUntil) + '. ' }));
+      var unlink = el('button', { type: 'button', className: 'linkish', text: 'Remove link' });
+      unlink.addEventListener('click', function () { draft.proforma = null; saveDraft(); showPi(); render(); });
+      box.appendChild(unlink);
+    }
+
+    // ---- Scans -----------------------------------------------------------
+    // The battery QR holds https://anantenergies.tech/warranty.html?sn=PACK.
+    // A plain pack number (typed, or from a USB scanner) works too.
+    function packFrom(text) {
+      var t = String(text || '').trim();
+      if (/^https?:\/\//i.test(t)) {
+        try {
+          var u = new URL(t);
+          return (u.searchParams.get('sn') || u.searchParams.get('serial') || '').trim().toUpperCase();
+        } catch (e) { return ''; }
+      }
+      return t.toUpperCase();
+    }
+    function keyOf(pack) { return pack.replace(/[^A-Z0-9]/g, ''); }
+
+    function handleScan(text, fromCamera) {
+      if (mode !== 'invoice') return;
+      var pack = packFrom(text), key = keyOf(pack), now = Date.now();
+      if (fromCamera && key && lastSeen[key] && now - lastSeen[key] < 4000) { lastSeen[key] = now; return; }
+      if (key) lastSeen[key] = now;
+      if (!key || pack.length > 40) { flash('error', 'No pack number in this code.', 'Scan the QR code on the battery label.'); buzz('error'); return; }
+      if (!$('dealer').value) { flash('error', 'Choose who this is billed to first.', 'Then scan ' + pack + ' again.'); buzz('error'); $('dealer').focus(); return; }
+
+      for (var i = 0; i < draft.packs.length; i++) {
+        var it = draft.packs[i];
+        if (it.key === key) {
+          if (it.state === 'error') { draft.packs.splice(i, 1); break; }   // scanned again after a problem: check again
+          flash(it.state === 'ok' ? 'ok' : '', pack + ' is already on this invoice.',
+            it.model || (it.stock ? 'Stock pack, model not chosen yet.' : 'Checking…'));
+          buzz('same');
+          return;
+        }
+      }
+      var item = { key: key, pack: pack, state: 'wait', model: '', price: null, text: 'Checking…' };
+      draft.packs.unshift(item);
+      saveDraft();
+      flash('', pack + ' scanned.', 'Checking it in the sheet…');
+      buzz('ok');
+      render();
+      check(item);
+    }
+
+    function check(item) {
+      post({ action: 'packInfo', pin: pin, serial: item.pack }).then(function (res) {
+        if (isPinProblem(res)) { showSignIn(res.message + ' Sign in again to continue.'); return; }
+        if (res && res.code === 'BUSY') { item.text = 'Server busy, checking again…'; render(); setTimeout(function () { check(item); }, 3000); return; }
+        settle(item, res || {});
+      }, function () {
+        item.text = 'No connection. It will be checked when the connection is back.';
+        render();
+      });
+    }
+
+    function recheckWaiting() {
+      drafts.invoice.packs.forEach(function (item) { if (item.state === 'wait') check(item); });
+    }
+    window.addEventListener('online', function () { if (pin) recheckWaiting(); });
+
+    function defaultPrice(model, fallback) {
+      var p = product(model), base = fallback || (p && p.price);
+      if (!base) return null;
+      return draft.inclusive ? round2(base * (1 + rateOf(model) / 100)) : base;
+    }
+
+    function settle(item, res) {
+      var d = drafts.invoice;
+      if (d.packs.indexOf(item) === -1) return;   // removed meanwhile
+      if (res.ok) {
+        item.state = 'ok';
+        item.pack = res.serial || item.pack;
+        // A stock pack has no model in the sheet yet: it takes the model chosen for stock packs, saved with the invoice.
+        item.stock = !!res.stock;
+        item.model = item.stock ? d.stockModel || '' : res.model || '';
+        var who = $('dealer').value === NEW ? 'the new customer' : $('dealer').value;
+        item.text = res.previousDealer && res.previousDealer.toUpperCase() !== String(d.dealer).toUpperCase()
+          ? 'Was scanned out to ' + res.previousDealer + '. This invoice moves it to ' + who + '.' : '';
+        if (item.model && !(d.prices[item.model] > 0)) {
+          var p = defaultPrice(item.model, item.stock ? null : res.price);
+          if (p) d.prices[item.model] = p;
+        }
+      } else {
+        item.state = 'error';
+        item.text = res.message || 'Cannot go on this invoice.';
+        buzz('error');
+      }
+      if (d.packs[0] === item && mode === 'invoice') {
+        if (item.state !== 'ok') flash('error', item.pack + ' cannot be added.', item.text);
+        else if (item.stock && !item.model) flash('warn', item.pack + ' is a stock pack.', 'Choose its model under "Model for stock packs".');
+        else flash(item.text ? 'warn' : 'ok', item.pack + ' added · ' + item.model + (item.stock ? ' (stock pack)' : ''), item.text);
+      }
+      save('localStorage', 'anantInvoiceDraft', JSON.stringify(d));
+      render();
+    }
+
+    /** The model stock packs are saved as on this invoice. Stock packs still without a model get it now. */
+    function setStockModel(model) {
+      draft.stockModel = model || '';
+      if (!model) return;
+      draft.packs.forEach(function (p) { if (p.stock && p.state === 'ok' && !p.model) p.model = model; });
+      if (!(draft.prices[model] > 0)) { var price = defaultPrice(model); if (price) draft.prices[model] = price; }
+    }
+
+    $('stockModel').addEventListener('change', function () {
+      setStockModel(this.value);
+      saveDraft();
+      render();
+      if (this.value) flash('ok', 'Stock packs: ' + this.value + '.', 'The stock packs you scan next are saved as this model.');
+    });
+
+    function removeItem(item) {
+      draft.packs.splice(draft.packs.indexOf(item), 1);
+      delete lastSeen[item.key];
+      saveDraft();
+      render();
+    }
+
+    $('manualForm').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var input = $('manual');
+      if (input.value.trim()) handleScan(input.value, false);
+      input.value = '';
+      input.focus();
+    });
+
+    // ---- Batteries on a proforma (model and quantity) ---------------------------
+    $('addModel').addEventListener('click', function () {
+      var model = $('pickModel').value, qty = parseInt($('pickQty').value, 10);
+      if (!model) { $('pickModel').focus(); return; }
+      if (!(qty > 0)) { $('pickQty').focus(); return; }
+      var line = draft.batteries.filter(function (b) { return b.model === model; })[0];
+      if (line) line.qty += qty; else draft.batteries.push({ model: model, qty: qty });
+      if (!(draft.prices[model] > 0)) { var p = defaultPrice(model); if (p) draft.prices[model] = p; }
+      $('pickModel').value = '';
+      $('pickQty').value = '1';
+      saveDraft();
+      render();
+    });
+
+    // ---- Other items -----------------------------------------------------------
+    $('addItem').addEventListener('click', function () {
+      draft.items.push({ description: '', hsn: '', qty: 1, price: '', rate: info.rates[info.rates.length - 1] });
+      saveDraft();
+      renderItems();
+      showTotals();
+      var all = document.querySelectorAll('#items .item-desc');
+      if (all.length) all[all.length - 1].focus();
+    });
+
+    function renderItems() {
+      var box = $('items');
+      box.textContent = '';
+      draft.items.forEach(function (it, i) {
+        var desc = el('input', { className: 'item-desc', value: it.description || '', maxLength: 200, placeholder: 'Description, e.g. 60V 6A charger', 'aria-label': 'Item ' + (i + 1) + ' description' });
+        var hsn = el('input', { value: it.hsn || '', maxLength: 10, placeholder: 'HSN', inputMode: 'numeric', 'aria-label': 'Item ' + (i + 1) + ' HSN' });
+        var qty = el('input', { type: 'number', min: '1', step: '1', value: it.qty || 1, inputMode: 'numeric', 'aria-label': 'Item ' + (i + 1) + ' quantity' });
+        var price = el('input', { type: 'number', min: '0', step: '0.01', value: it.price || '', placeholder: 'Price', inputMode: 'decimal', 'aria-label': 'Item ' + (i + 1) + ' price' });
+        var rate = el('select', { 'aria-label': 'Item ' + (i + 1) + ' GST rate' });
+        info.rates.forEach(function (r) { rate.add(new Option('GST ' + r + '%', r)); });
+        rate.value = String(it.rate);
+        var remove = el('button', { type: 'button', className: 'small-btn', text: 'Remove', 'aria-label': 'Remove item ' + (i + 1) });
+        [[desc, 'description'], [hsn, 'hsn'], [qty, 'qty'], [price, 'price'], [rate, 'rate']].forEach(function (f) {
+          f[0].addEventListener('input', function () {
+            it[f[1]] = f[1] === 'qty' || f[1] === 'price' || f[1] === 'rate' ? (this.value === '' ? '' : Number(this.value)) : this.value;
+            saveDraft();
+            showTotals();
+          });
+        });
+        remove.addEventListener('click', function () { draft.items.splice(i, 1); saveDraft(); renderItems(); showTotals(); });
+        var mini = function (text, input) { return el('label', { className: 'mini' }, [el('span', { text: text }), input]); };
+        box.appendChild(el('div', { className: 'item' }, [desc, el('div', { className: 'item-row' },
+          [mini('HSN', hsn), mini('Qty', qty), mini('Price', price), mini('GST', rate), remove])]));
+      });
+    }
+
+    // ---- Prices including GST or not ------------------------------------------
+    $('inclusive').addEventListener('change', function () {
+      var on = this.checked;
+      Object.keys(draft.prices).forEach(function (m) {
+        var r = rateOf(m), p = Number(draft.prices[m]);
+        if (p > 0) draft.prices[m] = round2(on ? p * (1 + r / 100) : p / (1 + r / 100));
+      });
+      draft.items.forEach(function (it) {
+        var p = Number(it.price), r = Number(it.rate);
+        if (p > 0) it.price = round2(on ? p * (1 + r / 100) : p / (1 + r / 100));
+      });
+      draft.inclusive = on;
+      saveDraft();
+      renderItems();
+      render();
+    });
+
+    // ---- Display -----------------------------------------------------------
+    function flash(kind, title, detail) {
+      var box = $('last');
+      box.className = 'last' + (kind ? ' ' + kind : '');
+      box.textContent = title;
+      if (detail) box.appendChild(el('small', { text: detail }));
+    }
+
+    /** Battery lines as { model: count } and their order, from scanned packs or proforma lines. */
+    function batteryCounts() {
+      var byModel = {}, order = [];
+      if (mode === 'invoice') {
+        draft.packs.forEach(function (p) {
+          if (p.state !== 'ok' || !p.model) return;
+          if (!byModel[p.model]) { byModel[p.model] = 0; order.push(p.model); }
+          byModel[p.model]++;
+        });
+        if (draft.proforma) {
+          draft.proforma.batteries.forEach(function (b) { if (!(b.model in byModel)) { byModel[b.model] = 0; order.push(b.model); } });
+        }
+      } else {
+        draft.batteries.forEach(function (b) { byModel[b.model] = b.qty; order.push(b.model); });
+      }
+      return { byModel: byModel, order: order };
+    }
+
+    var ICON = { ok: '✓', error: '✕', wait: '…' };
+    function render() {
+      if (mode === 'invoice') renderPacks(); else renderBatteries();
+      renderPrices();
+      showTotals();
+      $('create').textContent = busy ? (mode === 'proforma' ? 'Creating proforma…' : 'Creating invoice…')
+        : (mode === 'proforma' ? 'Create proforma' : 'Create invoice');
+    }
+
+    function renderPacks() {
+      var list = $('list'), good = 0, waiting = 0, problems = 0;
+      list.textContent = '';
+      draft.packs.forEach(function (item) {
+        if (item.state === 'ok') good++; else if (item.state === 'wait') waiting++; else problems++;
+        var stock = item.state === 'ok' && item.stock;
+        var warn = item.state === 'ok' && (item.text || (stock && !item.model));
+        var remove = el('button', { type: 'button', text: 'Remove', 'aria-label': 'Remove ' + item.pack });
+        remove.addEventListener('click', function () { removeItem(item); });
+        list.appendChild(el('li', { className: warn ? 'warn' : item.state }, [
+          el('span', { className: 'icon', text: warn ? '!' : ICON[item.state] }),
+          el('span', { className: 'sn', text: item.pack + (stock ? ' · stock pack' : item.model ? ' · ' + item.model : '') }),
+          el('span', {}, [remove]),
+          stock ? lineModel(item) : null,
+          item.text ? el('span', { className: 'msg', text: item.text }) : null,
+        ]));
+      });
+      $('stockPart').hidden = !draft.packs.some(function (p) { return p.stock; });
+      $('stockModel').value = draft.stockModel || '';
+      var counts = $('counts');
+      counts.textContent = '';
+      [[good, good === 1 ? 'pack' : 'packs'], [waiting, 'checking'], [problems, problems === 1 ? 'problem' : 'problems']].forEach(function (c, i) {
+        if (!c[0] && i) return;
+        counts.appendChild(el('span', {}, [el('b', { text: String(c[0]) }), document.createTextNode(' ' + c[1])]));
+      });
+    }
+
+    /** A stock pack's own model dropdown, to fix one pack without changing the others. */
+    function lineModel(item) {
+      var pick = el('select', { className: 'line-model', 'aria-label': 'Model of ' + item.pack });
+      pick.add(new Option('Choose the model', ''));
+      info.models.forEach(function (m) { pick.add(new Option(m.model, m.model)); });
+      pick.value = item.model || '';
+      pick.addEventListener('change', function () {
+        item.model = this.value;
+        if (item.model && !(draft.prices[item.model] > 0)) { var p = defaultPrice(item.model); if (p) draft.prices[item.model] = p; }
+        saveDraft();
+        render();
+      });
+      return pick;
+    }
+
+    function renderBatteries() {
+      var list = $('batteryList');
+      list.textContent = '';
+      draft.batteries.forEach(function (b, i) {
+        var qty = el('input', { type: 'number', min: '1', step: '1', value: b.qty, inputMode: 'numeric', className: 'qty', 'aria-label': 'Quantity of ' + b.model });
+        qty.addEventListener('input', function () { var q = parseInt(this.value, 10); if (q > 0) { b.qty = q; saveDraft(); renderPrices(); showTotals(); } });
+        var remove = el('button', { type: 'button', text: 'Remove', 'aria-label': 'Remove ' + b.model });
+        remove.addEventListener('click', function () { draft.batteries.splice(i, 1); saveDraft(); render(); });
+        list.appendChild(el('li', { className: 'ok' }, [el('span', { className: 'icon', text: '•' }), el('span', { className: 'sn', text: b.model }),
+          el('span', { className: 'qty-cell' }, [qty, remove])]));
+      });
+    }
+
+    function renderPrices() {
+      var box = $('models');
+      if (document.activeElement && document.activeElement.getAttribute('data-model')) return;   // typing a price
+      var counts = batteryCounts();
+      box.textContent = '';
+      $('noModels').hidden = counts.order.length > 0;
+      counts.order.forEach(function (model) {
+        var ordered = mode === 'invoice' && draft.proforma
+          ? (draft.proforma.batteries.filter(function (b) { return b.model === model; })[0] || {}).qty : null;
+        var label = el('label', { htmlFor: 'price-' + model.replace(/[^A-Za-z0-9]/g, '') }, [
+          el('b', { text: model }),
+          document.createTextNode(' × ' + counts.byModel[model] + (ordered != null ? ' of ' + ordered + ' on the PI' : '')),
+        ]);
+        var input = el('input', { id: 'price-' + model.replace(/[^A-Za-z0-9]/g, ''), type: 'number', min: '1', step: '0.01',
+          inputMode: 'decimal', 'data-model': model, value: draft.prices[model] || '', placeholder: 'Price' });
+        input.addEventListener('input', function () {
+          var v = Number(this.value);
+          if (v > 0) draft.prices[model] = v; else delete draft.prices[model];
+          saveDraft();
+          showTotals();
+        });
+        input.addEventListener('blur', function () { setTimeout(renderPrices, 0); });
+        var usual = (product(model) || {}).term || '';
+        var term = el('select', { 'data-term': model, 'aria-label': 'Warranty for ' + model });
+        var choices = (info.terms || []).slice();
+        [usual, termOf(model)].forEach(function (t) { if (t && choices.indexOf(t) === -1) choices.unshift(t); });
+        choices.forEach(function (t) { term.add(new Option('Warranty ' + termName(t) + (t === usual ? ' (usual)' : ''), t)); });
+        term.value = termOf(model);
+        term.addEventListener('change', function () {
+          if (this.value === usual) delete draft.terms[model]; else draft.terms[model] = this.value;
+          saveDraft();
+        });
+        box.appendChild(el('div', { className: 'price-row' }, [label, el('div', { className: 'price-cells' }, [input, term])]));
+      });
+    }
+
+    /** Totals worked out the same way as the sheet: every line rounded on its own. */
+    function computeTotals() {
+      var counts = batteryCounts(), taxable = 0, tax = 0, missing = [];
+      function unit(price, rate) {
+        var p = Math.round(Number(price || 0) * 100);
+        return draft.inclusive ? Math.round(p * 100 / (100 + rate)) : p;
+      }
+      counts.order.forEach(function (m) {
+        var n = counts.byModel[m];
+        if (!n) return;
+        var r = rateOf(m), u = unit(draft.prices[m], r);
+        if (!u) { missing.push(m); return; }
+        if (mode === 'invoice') { taxable += u * n; tax += Math.round(u * r / 100) * n; }
+        else { taxable += u * n; tax += Math.round(u * n * r / 100); }
+      });
+      var badItem = '';
+      draft.items.forEach(function (it) {
+        if (!String(it.description || '').trim()) return;
+        var r = Number(it.rate), q = Number(it.qty), u = unit(it.price, r);
+        if (!(q > 0) || !u) { badItem = badItem || String(it.description).trim(); return; }
+        taxable += u * q;
+        tax += Math.round(u * q * r / 100);
+      });
+      return { taxable: taxable, tax: tax, total: Math.round((taxable + tax) / 100), missing: missing, badItem: badItem,
+        lines: counts.order.filter(function (m) { return counts.byModel[m]; }).length +
+          draft.items.filter(function (it) { return String(it.description || '').trim(); }).length };
+    }
+
+    function blockingNote(t) {
+      var waiting = mode === 'invoice' && draft.packs.some(function (p) { return p.state === 'wait'; });
+      var problems = mode === 'invoice' ? draft.packs.filter(function (p) { return p.state === 'error'; }).length : 0;
+      var unnamed = mode === 'invoice' ? draft.packs.filter(function (p) { return p.state === 'ok' && p.stock && !p.model; }).length : 0;
+      var d = dealer();
+      if (info.setupProblem) return info.setupProblem;
+      if (!d) return 'Choose who this is billed to.';
+      if (d.problem) return d.problem;
+      if (problems) return 'Remove the ' + (problems === 1 ? 'pack' : 'packs') + ' marked ✕ first.';
+      if (waiting) return 'Waiting for packs to be checked.';
+      if (unnamed) return 'Choose the model for the ' + (unnamed === 1 ? 'stock pack' : unnamed + ' stock packs') + ' marked !.';
+      if (t.missing.length) return 'Type the price for ' + t.missing.join(', ') + '.';
+      if (t.badItem) return 'Fill the quantity and price for "' + t.badItem + '".';
+      if (!t.lines) return mode === 'invoice' ? 'Scan the packs or add an item.' : 'Add the batteries or items.';
+      return '';
+    }
+
+    function showTotals() {
+      var t = computeTotals(), box = $('totals');
+      box.textContent = '';
+      [['Before GST', money(t.taxable / 100)], ['GST', money(t.tax / 100)], ['Total (rounded)', money(t.total)]].forEach(function (l, i) {
+        box.appendChild(el('div', { className: 'tl' + (i === 2 ? ' big' : '') }, [el('span', { text: l[0] }), el('span', { text: l[1] })]));
+      });
+      var note = blockingNote(t);
+      if (note) box.appendChild(el('p', { className: 'muted', text: note, style: 'margin:8px 0 0' }));
+      if (!note && mode === 'invoice' && draft.proforma) {
+        var counts = batteryCounts();
+        var differs = draft.proforma.batteries.some(function (b) { return counts.byModel[b.model] !== b.qty; });
+        if (differs) box.appendChild(el('p', { className: 'warnbox', text: 'The packs scanned are not the same as the quantities on ' + draft.proforma.no + '. You can still create the invoice.', style: 'margin:8px 0 0' }));
+      }
+      $('create').disabled = busy || !!note;
+      return t;
+    }
+
+    // ---- Create ----------------------------------------------------------------
+    $('create').addEventListener('click', function () {
+      var t = showTotals(), d = dealer();
+      if ($('create').disabled || !d) return;
+      var what = mode === 'proforma' ? 'proforma' : 'invoice';
+      var packs = mode === 'invoice' ? draft.packs.filter(function (p) { return p.state === 'ok'; }) : [];
+      if (!window.confirm('Create the ' + what + ' for ' + d.name + '?\nTotal ' + money(t.total) + '.' +
+        (packs.length ? '\n\n' + packs.length + (packs.length === 1 ? ' pack is' : ' packs are') + ' recorded as dispatched to ' + d.name + '.' : ''))) return;
+      busy = true;
+      render();
+      $('createError').hidden = true;
+      var body = {
+        action: mode, pin: pin, requestId: draft.requestId, inclusive: !!draft.inclusive, prices: draft.prices,
+        items: draft.items.filter(function (it) { return String(it.description || '').trim(); }),
+        notes: draft.notes, chargerModel: draft.chargerModel, chargerSerial: draft.chargerSerial,
+      };
+      if (d.isNew) body.newCustomer = Object.assign({ state: $('ncState').value }, draft.newCustomer); else body.dealer = d.name;
+      if (mode === 'invoice') {
+        body.serials = packs.map(function (p) { return p.pack; });
+        body.stockModels = {};   // saved to each stock pack's row in the sheet with the invoice
+        packs.forEach(function (p) { if (p.stock) body.stockModels[p.pack] = p.model; });
+        if (draft.proforma) body.proformaNo = draft.proforma.no;
+        body.warranty = {};
+        packs.forEach(function (p) { if (termOf(p.model)) body.warranty[p.model] = termOf(p.model); });
+      } else {
+        body.batteries = draft.batteries.map(function (b) {
+          return { model: b.model, qty: b.qty, price: draft.prices[b.model], warranty: termOf(b.model) };
+        });
+      }
+      send(body, d, 0);
+    });
+
+    function send(body, d, attempt) {
+      var kind = mode, sentDraft = draft;
+      post(body).then(function (res) {
+        if (res && res.code === 'BUSY' && attempt < 3) { setTimeout(function () { send(body, d, attempt + 1); }, 3000); return; }
+        finishCreate();
+        if (isPinProblem(res)) { showSignIn(res.message + ' Sign in again, then tap Create again.'); return; }
+        if (res && res.ok) { showDone(res, d, kind); return; }
+        if (res && res.problems) {
+          res.problems.forEach(function (p) {
+            sentDraft.packs.forEach(function (item) {
+              if (item.key === keyOf(String(p.serial).toUpperCase())) { item.state = 'error'; item.text = p.message; }
+            });
+          });
+          saveDraft();
+          render();
+        }
+        createError((res && res.message) || 'It was not created. Please try again.');
+      }, function () {
+        // The same request ID is sent again, so a retry can never make a second document.
+        if (attempt < 2) { setTimeout(function () { send(body, d, attempt + 1); }, 2500); return; }
+        finishCreate();
+        createError('Could not reach the server. Check the internet and tap Create again. It will not make a duplicate.');
+      });
+    }
+    function finishCreate() { busy = false; render(); }
+    function createError(message) { $('createError').textContent = message; $('createError').hidden = false; }
+
+    function showDone(res, d, kind) {
+      var isPi = kind === 'proforma';
+      stopCamera();
+      $('maker').hidden = true;
+      $('done').hidden = false;
+      $('doneTitle').textContent = res.status === 'ALREADY' ? 'This was already created.' : (isPi ? 'Proforma created.' : 'Invoice created.');
+      $('outNoLabel').textContent = isPi ? 'Proforma no.' : 'Invoice no.';
+      $('outNo').textContent = res.invoiceNo;
+      $('outDealer').textContent = res.dealer;
+      $('outPacksLabel').textContent = isPi ? 'Valid until' : 'Packs';
+      $('outPacks').textContent = isPi ? res.validUntil : res.packs;
+      $('outTotal').textContent = money(res.total);
+      var notes = [res.message, res.pdfProblem].filter(Boolean).join(' ');
+      $('outNote').textContent = notes;
+      $('outNote').hidden = !notes;
+      $('openPdf').hidden = !res.pdfUrl;
+      if (res.pdfUrl) $('openPdf').href = res.pdfUrl;
+      var phone = String(d.phone || '').replace(/\D/g, '');
+      if (phone.length === 10) phone = '91' + phone;
+      var from = (info.business && info.business.name) || 'Anant Energies';
+      var text = (isPi ? 'Proforma invoice ' : 'Invoice ') + res.invoiceNo + ' from ' + from + '\n' +
+        (isPi ? 'Valid until: ' + res.validUntil + '\n' : 'Packs: ' + res.packs + '\n') +
+        (isPi ? 'Amount payable: ' : 'Total: ') + money(res.total) + (res.pdfUrl ? '\nPDF: ' + res.pdfUrl : '') +
+        (isPi ? '\n\nPlease pay to confirm the order. Bank and UPI details are on the PDF.'
+          : (res.packs ? '\n\nPlease make sure every customer registers the warranty card at the counter.' : ''));
+      $('whatsapp').href = 'https://wa.me/' + (phone.length >= 11 ? phone : '') + '?text=' + encodeURIComponent(text);
+      var keep = res.dealer && info.dealers.some(function (x) { return x.name === res.dealer; }) ? res.dealer : '';
+      drafts[kind] = newDraft();
+      drafts[kind].dealer = keep;
+      if (kind === mode) draft = drafts[kind];
+      save('localStorage', isPi ? 'anantProformaDraft' : 'anantInvoiceDraft', JSON.stringify(drafts[kind]));
+      lastSeen = {};
+      // Refresh the customer list and the proformas waiting for payment (this one may be new, or now paid).
+      loadInfo(pin).catch(function () { /* the lists refresh next time */ });
+      window.scrollTo(0, 0);
+    }
+
+    $('newInvoice').addEventListener('click', openMaker);
+
+    $('clear').addEventListener('click', function () {
+      if (!window.confirm('Clear this form?')) return;
+      var keepDealer = draft.dealer === NEW ? '' : draft.dealer;
+      drafts[mode] = newDraft();
+      draft = drafts[mode];
+      draft.dealer = keepDealer;
+      lastSeen = {};
+      saveDraft();
+      showForm();
+      flash('', 'Cleared.');
+    });
+
+    // ---- Sound and vibration ---------------------------------------------
+    var audio = null;
+    function unlockAudio() {
+      try {
+        audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+        if (audio.state === 'suspended') audio.resume();
+      } catch (e) { audio = null; }
+    }
+    function beep(freq, ms) {
+      if (!audio) return;
+      try {
+        var osc = audio.createOscillator(), gain = audio.createGain();
+        osc.frequency.value = freq;
+        gain.gain.value = 0.12;
+        osc.connect(gain); gain.connect(audio.destination);
+        osc.start(); osc.stop(audio.currentTime + ms / 1000);
+      } catch (e) { /* no sound */ }
+    }
+    function buzz(kind) {
+      var vibrate = navigator.vibrate ? navigator.vibrate.bind(navigator) : function () {};
+      if (kind === 'ok') { beep(1320, 90); vibrate(60); }
+      else if (kind === 'same') { beep(880, 50); }
+      else { beep(260, 300); vibrate([90, 60, 90]); }
+    }
+    document.addEventListener('pointerdown', unlockAudio, { once: true });
+
+    // ---- Camera ------------------------------------------------------------
+    var stream = null, scanning = false, torchOn = false;
+
+    function camMessage(text) { $('camMsg').textContent = text; }
+
+    function loadScript(src) {
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src; s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    // Chrome on Android reads QR codes natively. Other browsers (iPhone) use jsQR.
+    function getDecoder() {
+      var native = !('BarcodeDetector' in window) ? Promise.reject(new Error('none'))
+        : Promise.resolve(window.BarcodeDetector.getSupportedFormats ? window.BarcodeDetector.getSupportedFormats() : ['qr_code'])
+          .then(function (formats) {
+            if (formats.indexOf('qr_code') === -1) throw new Error('no qr_code');
+            var detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+            return function () {
+              return detector.detect(video).then(function (codes) { return codes.length ? codes[0].rawValue : null; });
+            };
+          });
+      return native.catch(function () {
+        return (window.jsQR ? Promise.resolve() : loadScript('js/jsQR.min.js')).then(function () {
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d', { willReadFrequently: true });
+          return function () {
+            var w = video.videoWidth, h = video.videoHeight;
+            if (!w || !h) return Promise.resolve(null);
+            var scale = Math.min(1, 800 / Math.max(w, h));
+            canvas.width = Math.round(w * scale);
+            canvas.height = Math.round(h * scale);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var found = window.jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
+            return Promise.resolve(found ? found.data : null);
+          };
+        });
+      });
+    }
+
+    function scanLoop(decode) {
+      if (!scanning) return;
+      decode().then(function (text) { if (text && scanning) handleScan(text, true); }, function () { /* frame not ready */ })
+        .then(function () { if (scanning) setTimeout(function () { scanLoop(decode); }, 120); });
+    }
+
+    function startCamera() {
+      unlockAudio();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        camMessage('This browser cannot use the camera on this page. Use Chrome on Android or Safari on iPhone, and open the page with https://. You can still type pack numbers below.');
+        return;
+      }
+      $('camStart').disabled = true;
+      camMessage('Starting the camera…');
+      navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      }).then(function (s) {
+        stream = s;
+        video.srcObject = s;
+        return video.play();
+      }).then(getDecoder).then(function (decode) {
+        scanning = true;
+        $('camIdle').hidden = true;
+        $('aim').hidden = false;
+        $('camStop').hidden = false;
+        var track = stream.getVideoTracks()[0];
+        var caps = track && track.getCapabilities ? track.getCapabilities() : {};
+        $('torch').hidden = !caps.torch;
+        scanLoop(decode);
+      }).catch(function (err) {
+        stopCamera();
+        camMessage(err && err.name === 'NotAllowedError'
+          ? 'Camera permission was refused. Allow the camera for this site in the browser settings, then tap Start camera.'
+          : 'Could not start the camera. Close other apps that use it and try again, or type pack numbers below.');
+      }).then(function () { $('camStart').disabled = false; });
+    }
+
+    function stopCamera() {
+      scanning = false;
+      torchOn = false;
+      $('torch').textContent = 'Light on';
+      if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+      stream = null;
+      video.srcObject = null;
+      $('camIdle').hidden = false;
+      $('aim').hidden = true;
+      $('camStop').hidden = true;
+      $('torch').hidden = true;
+    }
+
+    $('camStart').addEventListener('click', startCamera);
+    $('camStop').addEventListener('click', function () {
+      stopCamera();
+      camMessage('Camera stopped. Tap Start camera to scan again.');
+    });
+    $('torch').addEventListener('click', function () {
+      var track = stream && stream.getVideoTracks()[0];
+      if (!track) return;
+      torchOn = !torchOn;
+      track.applyConstraints({ advanced: [{ torch: torchOn }] }).catch(function () { torchOn = false; });
+      this.textContent = torchOn ? 'Light off' : 'Light on';
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden && scanning) {
+        stopCamera();
+        camMessage('Camera paused while the page was hidden. Tap Start camera to continue.');
+      }
+    });
+
+    // ---- Start -------------------------------------------------------------
+    showForm();
+    if (pin && backendReady()) {
+      loadInfo(pin).then(openMaker, function (err) { showSignIn(err.code ? err.message : ''); });
+    }
+  })();
+</script>
+</body>
+</html>

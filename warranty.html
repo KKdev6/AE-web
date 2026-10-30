@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Register your warranty · Anant Energies</title>
+<meta name="description" content="Register the warranty of your Anant VoltX battery with the pack number and the secret code from the warranty card.">
+<meta name="theme-color" content="#0D1838">
+<link rel="icon" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap">
+<style>
+/* Same colours, type and buttons as the home page (index.html). */
+:root {
+  --bg: #ECE9E2; --surface: #F6F4EF; --ink: #0D1838; --ink-2: #4A5372; --line: #D3CEC2;
+  --blue: #2253ED; --blue-ink: #1A3FB8; --on-blue: #FFFFFF; --cyan: #46C3D6; --wa: #128C4A;
+  --error-bg: #FBE7E6; --error-ink: #A3161A; --ok-bg: #DDF1E6; --ok-ink: #11683A;
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --gutter: clamp(16px, 4vw, 40px); --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #080F26; --surface: #0F1A3A; --ink: #ECE9E2; --ink-2: #A3ABC6; --line: #24305A;
+    --blue: #4C78FF; --blue-ink: #8EA8FF; --wa: #1FA85C; color-scheme: dark;
+    --error-bg: #3A1520; --error-ink: #FFB3B3; --ok-bg: #0E2E22; --ok-ink: #7FE0AA;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #080F26; --surface: #0F1A3A; --ink: #ECE9E2; --ink-2: #A3ABC6; --line: #24305A;
+  --blue: #4C78FF; --blue-ink: #8EA8FF; --wa: #1FA85C; color-scheme: dark;
+  --error-bg: #3A1520; --error-ink: #FFB3B3; --ok-bg: #0E2E22; --ok-ink: #7FE0AA;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 var(--font);
+  font-variation-settings: "wdth" 100; -webkit-font-smoothing: antialiased; }
+a { color: var(--blue-ink); }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1160px; margin-inline: auto; padding-inline: var(--gutter); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .55em; min-height: 48px;
+  padding: .7em 1.25em; border-radius: 999px; border: 1.5px solid transparent; font: 600 1rem/1 var(--font);
+  text-decoration: none; cursor: pointer; }
+.btn-wa { background: var(--wa); color: #fff; }
+.btn-blue { background: var(--blue); color: var(--on-blue); }
+.btn-line { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn svg { width: 1.15em; height: 1.15em; flex: none; }
+
+.logo { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+.logo-mark, .logo-word { display: block; background: currentColor; -webkit-mask: var(--m) no-repeat center / contain; mask: var(--m) no-repeat center / contain; }
+.logo-mark { --m: url(img/logo-mark.png); width: 34px; height: 28px; }
+.logo-word { --m: url(img/logo-full.png); width: 150px; height: 11px; }
+.site-head { border-bottom: 1px solid var(--line); }
+.head-row { display: flex; align-items: center; gap: 12px; min-height: 64px; }
+.head-cta { display: flex; gap: 8px; margin-left: auto; }
+.head-cta .btn { min-height: 40px; padding: .55em 1em; font-size: .9rem; }
+@media (max-width: 560px) { .head-cta .call { display: none; } }
+@media (max-width: 420px) { .logo-word { width: 118px; } }
+
+main { padding-block: clamp(28px, 6vw, 64px) clamp(40px, 7vw, 80px); }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: clamp(24px, 5vw, 64px); align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+.eyebrow { font-size: .8rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--blue-ink); margin: 0; }
+h1 { font-weight: 800; font-variation-settings: "wdth" 112; letter-spacing: -.035em; line-height: .98;
+  font-size: clamp(2.3rem, 6vw, 4rem); margin: 14px 0 16px; text-wrap: balance; }
+.lede { color: var(--ink-2); margin: 0 0 22px; max-width: 32em; }
+.steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+.steps li { display: grid; grid-template-columns: 2rem 1fr; gap: 12px; color: var(--ink-2); }
+.steps b { color: var(--ink); }
+.steps .n { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--line); color: var(--ink); font-weight: 700; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(18px, 3vw, 28px); min-width: 0; }
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+.field label { font-size: .9rem; font-weight: 600; }
+.field .hint { font-weight: 400; color: var(--ink-2); }
+.field input { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line);
+  border-radius: 10px; padding: 11px 12px; width: 100%; }
+.field input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 25%, transparent); }
+.field input[aria-invalid=true] { border-color: var(--error-ink); }
+.upper { text-transform: uppercase; letter-spacing: .05em; }
+.consent { display: flex; gap: 10px; align-items: flex-start; margin-top: 4px; color: var(--ink-2); font-size: .95rem; }
+.consent input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--blue); }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+#turnstile { margin-top: 16px; }
+.error { margin-top: 16px; padding: 12px 14px; border-radius: 10px; background: var(--error-bg); color: var(--error-ink); }
+.submit { width: 100%; margin-top: 18px; font-size: 1.05rem; }
+.submit[disabled] { opacity: .65; cursor: wait; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid currentColor; border-right-color: transparent;
+  border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.tick { width: 56px; height: 56px; border-radius: 50%; background: var(--ok-bg); color: var(--ok-ink);
+  display: grid; place-items: center; font-size: 30px; font-weight: 700; margin-bottom: 12px; }
+.done h2 { font-size: 1.7rem; font-weight: 800; font-variation-settings: "wdth" 112; letter-spacing: -.02em; line-height: 1.1; margin: 0; }
+.done dl { margin: 18px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 10px 20px; }
+.done dt { color: var(--ink-2); font-size: .95rem; }
+.done dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.done .id { font-size: 1.25rem; letter-spacing: .02em; }
+.note { color: var(--ink-2); font-size: .92rem; margin: 18px 0 0; }
+.again { width: 100%; margin-top: 18px; }
+
+.site-foot { border-top: 1px solid var(--line); padding-block: 28px; }
+.foot-row { display: flex; flex-wrap: wrap; gap: 12px 32px; align-items: center; justify-content: space-between; }
+.foot-row p { margin: 0; font-size: .85rem; color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.22-8.23 8.22Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.29Z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></symbol>
+</svg>
+
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="logo" href="./" aria-label="Anant Energies home"><span class="logo-mark"></span><span class="logo-word"></span></a>
+    <div class="head-cta">
+      <a class="btn btn-line call" href="tel:+917717789324"><svg><use href="#i-phone"/></svg>Call</a>
+      <a class="btn btn-wa" href="https://wa.me/917717789324?text=Hi%20Anant%20Energies%2C%20I%20need%20help%20registering%20my%20battery%20warranty." target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>WhatsApp</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap layout">
+    <div>
+      <p class="eyebrow">Anant VoltX warranty</p>
+      <h1>Register your battery.</h1>
+      <p class="lede">Your warranty starts the day you register and runs for the period on your invoice. Once you register, this page shows your exact warranty dates.</p>
+      <ol class="steps" id="steps">
+        <li><span class="n">1</span><span><b>Scan the QR code on the warranty card.</b> It fills in the pack number and secret code for you.</span></li>
+        <li><span class="n">2</span><span><b>No QR code?</b> Type the pack number from the battery label and the secret code from the warranty card.</span></li>
+        <li><span class="n">3</span><span><b>Add your name and mobile number</b> and tap Register. Keep the Warranty ID you get.</span></li>
+      </ol>
+    </div>
+
+    <section class="panel" id="formCard" aria-label="Warranty registration form">
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="serial">Pack number <span class="hint">· on the battery label</span></label>
+          <input type="text" id="serial" name="serial" class="upper" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" required>
+        </div>
+        <div class="field">
+          <label for="code">Secret code <span class="hint">· on the warranty card in the box</span></label>
+          <input type="text" id="code" name="code" class="upper" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="20" required>
+        </div>
+        <div class="field">
+          <label for="name">Your full name</label>
+          <input type="text" id="name" name="name" autocomplete="name" maxlength="80" required>
+        </div>
+        <div class="field">
+          <label for="mobile">Mobile number</label>
+          <input type="tel" id="mobile" name="mobile" inputmode="tel" autocomplete="tel" maxlength="20" required>
+        </div>
+        <div class="field">
+          <label for="email">Email <span class="hint">· optional, we email your warranty details</span></label>
+          <input type="email" id="email" name="email" inputmode="email" autocomplete="email" maxlength="120">
+        </div>
+        <div class="field">
+          <label for="city">City <span class="hint">· optional</span></label>
+          <input type="text" id="city" name="city" autocomplete="address-level2" maxlength="60">
+        </div>
+
+        <div class="hp" aria-hidden="true">
+          <label for="website">Leave this empty</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <label class="consent">
+          <input type="checkbox" id="consent" name="consent">
+          <span>I agree that Anant Energies may keep these details to provide warranty service.</span>
+        </label>
+
+        <div id="turnstile"></div>
+        <div class="error" id="error" role="alert" hidden></div>
+        <button type="submit" class="btn btn-blue submit" id="submit">Register warranty</button>
+      </form>
+    </section>
+
+    <section class="panel done" id="success" aria-live="polite" hidden>
+      <div class="tick" aria-hidden="true">&#10003;</div>
+      <h2 id="successTitle">Warranty registered</h2>
+      <dl>
+        <dt>Warranty ID</dt><dd class="id" id="outId"></dd>
+        <dt>Battery</dt><dd id="outModel"></dd>
+        <dt>Pack number</dt><dd id="outSerial"></dd>
+        <dt id="outTermLabel">Warranty</dt><dd id="outTerm"></dd>
+        <dt>Warranty from</dt><dd id="outFrom"></dd>
+        <dt>Warranty till</dt><dd id="outTill"></dd>
+        <dt id="outServiceLabel">Service warranty till</dt><dd id="outService"></dd>
+      </dl>
+      <p class="note">Take a screenshot of this screen. Give your Warranty ID when you call or WhatsApp us for service.</p>
+      <button type="button" class="btn btn-line again" id="again">Register another battery</button>
+    </section>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-row">
+    <a class="logo" href="./" aria-label="Anant Energies home"><span class="logo-mark"></span><span class="logo-word"></span></a>
+    <p>Need help? Call or WhatsApp <a href="tel:+917717789324">+91 77177 89324</a>, Monday to Saturday, 10 am to 9 pm.</p>
+  </div>
+</footer>
+
+<script src="js/warranty-config.js"></script>
+<script>
+  (function () {
+    var CONFIG = window.WARRANTY_CONFIG || {};
+    var $ = function (id) { return document.getElementById(id); };
+    var form = $('form'), submit = $('submit'), errorBox = $('error');
+    var busy = false, turnstileWidget = null;
+
+    // The QR code on the battery opens warranty.html?sn=PACK. The one on the
+    // warranty card opens warranty.html?sn=PACK&c=CODE and fills in both.
+    var params = new URLSearchParams(location.search);
+    var sn = params.get('sn') || params.get('serial');
+    var qrCode = params.get('c');
+    if (sn) {
+      $('serial').value = sn.trim().toUpperCase();
+      $('steps').hidden = true; // came from a QR code, so the how-to is not needed
+    }
+    if (qrCode) {
+      $('code').value = qrCode.trim().toUpperCase();
+      params.delete('c');
+      var rest = params.toString();
+      history.replaceState(null, '', location.pathname + (rest ? '?' + rest : ''));
+    }
+
+    if (CONFIG.turnstileSiteKey) {
+      window.onTurnstileLoad = function () {
+        turnstileWidget = window.turnstile.render('#turnstile', { sitekey: CONFIG.turnstileSiteKey });
+      };
+      var s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad';
+      s.async = true;
+      document.head.appendChild(s);
+    }
+
+    function clean(v) { return String(v || '').replace(/\s+/g, ' ').trim(); }
+
+    function collect() {
+      return {
+        serial: clean($('serial').value).toUpperCase(),
+        code: clean($('code').value).toUpperCase(),
+        name: clean($('name').value),
+        mobile: clean($('mobile').value),
+        email: clean($('email').value),
+        city: clean($('city').value),
+        consent: $('consent').checked,
+        website: $('website').value,
+        turnstileToken: turnstileWidget !== null && window.turnstile ? window.turnstile.getResponse(turnstileWidget) : ''
+      };
+    }
+
+    // Quick checks in the browser. The server repeats every check.
+    function check(d) {
+      if (!d.serial) return ['serial', 'Please enter the pack number.'];
+      if (!d.code) return ['code', 'Please enter the secret code from the warranty card.'];
+      if (d.name.length < 2) return ['name', 'Please enter your full name.'];
+      var digits = d.mobile.replace(/\D/g, '');
+      if (digits.length < 7 || digits.length > 15) return ['mobile', 'Please enter a valid mobile number.'];
+      if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email)) return ['email', 'Please check your email address, or leave it empty.'];
+      if (!d.consent) return ['consent', 'Please tick the box to agree to us keeping your details for warranty service.'];
+      if (CONFIG.turnstileSiteKey && !d.turnstileToken) return [null, 'Please complete the "I am not a robot" check.'];
+      return null;
+    }
+
+    function clearErrors() {
+      errorBox.hidden = true;
+      errorBox.textContent = '';
+      Array.prototype.forEach.call(form.querySelectorAll('[aria-invalid]'), function (el) { el.removeAttribute('aria-invalid'); });
+    }
+
+    function showError(message, field) {
+      errorBox.textContent = message;
+      errorBox.hidden = false;
+      if (field && $(field)) {
+        $(field).setAttribute('aria-invalid', 'true');
+        $(field).focus();
+      } else {
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function setBusy(on) {
+      busy = on;
+      submit.disabled = on;
+      submit.innerHTML = on ? '<span class="spinner" aria-hidden="true"></span>Registering…' : 'Register warranty';
+    }
+
+    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+    function post(data) {
+      var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 30000) : null;
+      // Sent as plain text so the browser makes a simple request that Apps Script accepts.
+      return fetch(CONFIG.backendUrl, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        redirect: 'follow',
+        signal: ctrl ? ctrl.signal : undefined
+      }).then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      }).finally(function () { if (timer) clearTimeout(timer); });
+    }
+
+    // One automatic retry on a network failure. Retrying is safe: the same
+    // customer submitting twice gets the same registration back.
+    function send(data) {
+      return post(data).catch(function (err) {
+        if (CONFIG.turnstileSiteKey) throw err; // the robot check token works only once
+        return wait(1500).then(function () { return post(data); });
+      });
+    }
+
+    var FIELD_FOR = { NOT_FOUND: 'serial', WRONG_CODE: 'code', PAUSED: 'code' };
+
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (busy) return;
+      clearErrors();
+      if (!/^https:\/\//.test(CONFIG.backendUrl || '')) {
+        showError('Online registration is not switched on yet. Please call or WhatsApp us on +91 77177 89324 to register.');
+        return;
+      }
+      var data = collect();
+      var problem = check(data);
+      if (problem) { showError(problem[1], problem[0]); return; }
+
+      setBusy(true);
+      send(data).then(function (res) {
+        if (res && res.ok) showSuccess(res);
+        else showError((res && res.message) || 'Something went wrong. Please try again.', res && FIELD_FOR[res.code]);
+      }).catch(function () {
+        showError('We could not reach our server. Please check your internet connection and tap Register again. ' +
+          'You will not be registered twice.');
+      }).then(function () {
+        setBusy(false);
+        if (turnstileWidget !== null && window.turnstile) window.turnstile.reset(turnstileWidget);
+      });
+    });
+
+    function showSuccess(res) {
+      $('successTitle').textContent = res.status === 'ALREADY_YOURS' ? 'Already registered to you' : 'Warranty registered';
+      $('outId').textContent = res.warrantyId;
+      $('outModel').textContent = res.model ? 'Anant VoltX ' + res.model : '-';
+      $('outSerial').textContent = res.serial;
+      $('outTerm').textContent = res.term || '';
+      $('outTerm').hidden = $('outTermLabel').hidden = !res.term;
+      $('outFrom').textContent = res.validFrom;
+      $('outTill').textContent = res.validTill;
+      $('outService').textContent = res.serviceTill || '';
+      $('outService').hidden = $('outServiceLabel').hidden = !res.serviceTill;
+      $('formCard').hidden = true;
+      $('success').hidden = false;
+      $('success').scrollIntoView({ block: 'start' });
+    }
+
+    $('again').addEventListener('click', function () {
+      form.reset();
+      clearErrors();
+      $('success').hidden = true;
+      $('formCard').hidden = false;
+      $('steps').hidden = false;
+      history.replaceState(null, '', location.pathname);
+      $('serial').focus();
+    });
+  })();
+</script>
+</body>
+</html>
